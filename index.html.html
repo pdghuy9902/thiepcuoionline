@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Cưới Online | Gia Huy & Phương Uyên - 23.01.2027</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts hỗ trợ tiếng Việt sang trọng, trẻ trung & hiện đại -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tone.js cho nhạc nền piano nhẹ nhàng -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ivory: '#FDFBF7',
+                        cream: '#F5F2EB',
+                        matcha: {
+                            pale: '#E8F0E8',
+                            light: '#8FB092',
+                            DEFAULT: '#6B8E6E',
+                            dark: '#527355',
+                            deep: '#38523B'
+                        },
+                        gold: {
+                            light: '#E6CE8A',
+                            DEFAULT: '#C9A24B',
+                            dark: '#A37E2E'
+                        },
+                        charcoal: '#262E27'
+                    },
+                    fontFamily: {
+                        script: ['"Great Vibes"', 'cursive'],
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Be Vietnam Pro"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #262E27;
+            overflow-x: hidden;
+        }
+
+        /* Canvas hiệu ứng lá xanh matcha & ánh kim rơi nhẹ */
+        #petals-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spinSlow 9s linear infinite;
+        }
+
+        @keyframes floatGentle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+            animation: floatGentle 3.5s ease-in-out infinite;
+        }
+
+        /* Hiệu ứng xuất hiện mượt mà khi cuộn */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: all 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Đường kẻ trang trí hoa văn vàng đồng */
+        .gold-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.9rem;
+        }
+        .gold-divider::before,
+        .gold-divider::after {
+            content: "";
+            height: 1px;
+            width: 64px;
+            background: linear-gradient(90deg, transparent, #C9A24B, transparent);
+        }
+
+        /* Thanh cuộn tinh tế cho Sổ lưu bút */
+        .guestbook-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .guestbook-scroll::-webkit-scrollbar-track {
+            background: #E8F0E8;
+            border-radius: 10px;
+        }
+        .guestbook-scroll::-webkit-scrollbar-thumb {
+            background: #6B8E6E;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-matcha-pale selection:text-matcha-deep">
+
+    <!-- Canvas hiệu ứng lá matcha & hạt vàng rơi nhẹ -->
+    <canvas id="petals-canvas"></canvas>
+
+    <!-- Toast Thông báo hiện đại -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Thanh điều hướng Glassmorphism trẻ trung -->
+    <nav class="fixed top-0 left-0 right-0 z-30 py-3.5 px-4 sm:px-8">
+        <div class="max-w-6xl mx-auto flex items-center justify-between bg-ivory/85 backdrop-blur-md border border-gold/30 rounded-full px-5 py-2.5 shadow-sm">
+            <a href="#home" class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-matcha text-white font-serif font-bold flex items-center justify-center text-sm shadow-sm">
+                    H&amp;U
+                </span>
+                <span class="font-serif font-bold text-lg text-matcha-deep tracking-wide hidden sm:inline">
+                    Gia Huy <span class="text-gold">&amp;</span> Phương Uyên
+                </span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-7 text-sm font-medium text-charcoal/80">
+                <a href="#milestones" class="hover:text-matcha-dark transition">Hành Trình</a>
+                <a href="#event" class="hover:text-matcha-dark transition">Tiệc Cưới</a>
+                <a href="#gallery" class="hover:text-matcha-dark transition">Album Ảnh</a>
+                <a href="#rsvp" class="hover:text-matcha-dark transition">Xác Nhận Tham Dự</a>
+                <a href="#guestbook" class="hover:text-matcha-dark transition">Lời Chúc</a>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <a href="#rsvp" class="bg-matcha hover:bg-matcha-dark text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-full transition shadow-sm flex items-center gap-1.5">
+                    <i class="fa-regular fa-calendar-check"></i> Tham Dự
+                </a>
+                <button onclick="openAdminModal()" title="Quản lý danh sách & Ảnh" class="w-9 h-9 rounded-full bg-matcha-pale hover:bg-gold/20 text-matcha-deep flex items-center justify-center transition">
+                    <i class="fa-solid fa-sliders text-xs"></i>
+                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden w-9 h-9 rounded-full bg-cream flex items-center justify-center text-matcha-deep">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Dropdown Menu Mobile -->
+        <div id="mobile-menu" class="hidden md:hidden max-w-6xl mx-auto mt-2 bg-ivory/95 backdrop-blur-md border border-gold/30 rounded-2xl p-4 shadow-xl">
+            <div class="flex flex-col gap-2.5 text-center text-sm font-medium text-charcoal">
+                <a href="#milestones" onclick="toggleMobileMenu()" class="py-2 rounded-xl hover:bg-matcha-pale">Hành Trình Yêu Thương</a>
+                <a href="#event" onclick="toggleMobileMenu()" class="py-2 rounded-xl hover:bg-matcha-pale">Thời Gian &amp; Địa Điểm</a>
+                <a href="#gallery" onclick="toggleMobileMenu()" class="py-2 rounded-xl hover:bg-matcha-pale">Album Kỷ Niệm</a>
+                <a href="#rsvp" onclick="toggleMobileMenu()" class="py-2 rounded-xl hover:bg-matcha-pale">Xác Nhận Tham Dự</a>
+                <a href="#guestbook" onclick="toggleMobileMenu()" class="py-2 rounded-xl hover:bg-matcha-pale">Sổ Lưu Bút &amp; Lời Chúc</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. HERO SECTION - HIỆN ĐẠI, SANG TRỌNG TÔNG MATCHA & VÀNG ĐỒNG -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center pt-24 pb-16 px-4 overflow-hidden bg-gradient-to-br from-ivory via-matcha-pale/60 to-cream">
+        <!-- Vòng tròn trang trí nền nhẹ nhàng -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-matcha/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-gold/15 blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center relative z-10">
+            <!-- Cột trái: Thông tin cưới nổi bật -->
+            <div class="lg:col-span-7 text-center lg:text-left space-y-5">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-gold/40 shadow-sm text-xs font-semibold uppercase tracking-[0.22em] text-matcha-dark">
+                    <span class="w-2 h-2 rounded-full bg-gold animate-ping"></span>
+                    Save Our Wedding Date
+                </div>
+
+                <h1 class="font-script text-6xl sm:text-7xl xl:text-8xl text-matcha-deep leading-tight">
+                    Gia Huy <span class="text-gold text-5xl sm:text-6xl mx-1">&amp;</span> Phương Uyên
+                </h1>
+
+                <p class="font-serif italic text-xl sm:text-2xl text-charcoal/85 max-w-xl mx-auto lg:mx-0">
+                    “Từ những dấu mốc bình dị đến ngày chung đôi trọn đời — Trân trọng kính mời Quý khách đến chung vui cùng chúng tôi!”
+                </p>
+
+                <!-- Thẻ Thời Gian & Địa Điểm Tóm Tắt -->
+                <div class="bg-white/90 backdrop-blur-md rounded-3xl p-5 sm:p-6 border border-gold/35 shadow-md max-w-xl mx-auto lg:mx-0">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                        <div class="sm:border-r border-gold/25 sm:pr-4 text-center sm:text-left">
+                            <span class="text-[11px] uppercase tracking-widest text-gold-dark font-bold block">Thời Gian Tổ Chức</span>
+                            <p class="font-serif text-2xl sm:text-3xl font-bold text-matcha-deep mt-0.5">
+                                11:30 &bull; 23.01.2027
+                            </p>
+                            <p class="text-xs text-charcoal/70 mt-0.5">
+                                Thứ Bảy (16/12 năm Bính Ngọ)
+                            </p>
+                        </div>
+                        <div class="text-center sm:text-left sm:pl-2">
+                            <span class="text-[11px] uppercase tracking-widest text-gold-dark font-bold block">Địa Điểm Tiệc Cưới</span>
+                            <p class="font-serif text-lg font-bold text-charcoal mt-0.5 leading-snug">
+                                Trung tâm Hội nghị Tiệc cưới Victory
+                            </p>
+                            <p class="text-xs text-charcoal/70 mt-0.5">
+                                12 Mai Hắc Đế, P. Buôn Ma Thuột, Đắk Lắk
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                    <a href="#rsvp" class="px-7 py-3.5 rounded-full bg-matcha hover:bg-matcha-dark text-white text-sm font-medium shadow-md hover:shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> Xác Nhận Tham Dự
+                    </a>
+                    <a href="#guestbook" class="px-6 py-3.5 rounded-full bg-white hover:bg-gold/10 text-matcha-deep border border-gold/40 text-sm font-medium transition flex items-center gap-2">
+                        <i class="fa-regular fa-heart text-gold-dark"></i> Gửi Lời Chúc
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cột phải: Khung ảnh đôi thật của Gia Huy & Phương Uyên -->
+            <div class="lg:col-span-5 flex justify-center">
+                <div class="relative w-full max-w-sm sm:max-w-md">
+                    <!-- Viền vàng đồng nghệ thuật lệch góc -->
+                    <div class="absolute -inset-3 rounded-[2.2rem] border-2 border-gold/50 rotate-3 pointer-events-none"></div>
+                    <div class="absolute -inset-3 rounded-[2.2rem] bg-matcha/15 -rotate-2 pointer-events-none"></div>
+                    
+                    <div class="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white bg-white aspect-[3/4]">
+                        <img id="hero-couple-photo"
+                             src="ba29a828e5da65843ccb.jpg"
+                             onerror="this.src='https://placehold.co/600x800/6B8E6E/FDFBF7?text=Gia+Huy+%26+Phuong+Uyen'"
+                             alt="Gia Huy & Phương Uyên - Lễ Dạm Ngõ 30.05.2026"
+                             class="w-full h-full object-cover object-top hover:scale-105 transition duration-700 cursor-pointer"
+                             onclick="openLightbox(0)">
+                        <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent p-5 text-white">
+                            <span class="inline-block px-3 py-0.5 rounded-full bg-gold/90 text-[11px] font-semibold uppercase tracking-wider mb-1">
+                                30.05.2026 &rarr; 23.01.2027
+                            </span>
+                            <p class="font-serif italic text-lg">Từ Lễ Dạm Ngõ đến Ngày Chung Đôi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. ĐỒNG HỒ ĐẾM NGƯỢC (COUNTDOWN TỚI 11:30 NGÀY 23/01/2027 GMT+7) -->
+    <section class="py-14 sm:py-16 bg-matcha-dark text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#E6CE8A_1.2px,transparent_1.2px)] [background-size:22px_22px]"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10 reveal">
+            <span class="text-gold-light uppercase tracking-[0.25em] text-xs font-semibold">Counting Every Moment</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-semibold mt-1">
+                Đếm Ngược Tới Giờ G Hạnh Phúc
+            </h2>
+            <p class="text-white/80 text-xs sm:text-sm mt-1">
+                11:30 Trưa &bull; Thứ Bảy, Ngày 23 Tháng 01 Năm 2027
+            </p>
+
+            <div class="grid grid-cols-4 gap-3 sm:gap-6 max-w-xl mx-auto mt-7">
+                <div class="bg-white/10 backdrop-blur-md border border-gold/40 rounded-2xl py-4 sm:py-6 px-2 shadow-inner">
+                    <span id="cd-days" class="font-serif text-3xl sm:text-5xl font-bold text-gold-light block">00</span>
+                    <span class="text-[11px] sm:text-xs uppercase tracking-widest text-white/85 mt-1 block">Ngày</span>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-gold/40 rounded-2xl py-4 sm:py-6 px-2 shadow-inner">
+                    <span id="cd-hours" class="font-serif text-3xl sm:text-5xl font-bold text-gold-light block">00</span>
+                    <span class="text-[11px] sm:text-xs uppercase tracking-widest text-white/85 mt-1 block">Giờ</span>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-gold/40 rounded-2xl py-4 sm:py-6 px-2 shadow-inner">
+                    <span id="cd-minutes" class="font-serif text-3xl sm:text-5xl font-bold text-gold-light block">00</span>
+                    <span class="text-[11px] sm:text-xs uppercase tracking-widest text-white/85 mt-1 block">Phút</span>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-gold/40 rounded-2xl py-4 sm:py-6 px-2 shadow-inner">
+                    <span id="cd-seconds" class="font-serif text-3xl sm:text-5xl font-bold text-gold-light block">00</span>
+                    <span class="text-[11px] sm:text-xs uppercase tracking-widest text-white/85 mt-1 block">Giây</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. HÀNH TRÌNH YÊU THƯƠNG (LOVE STORY / MILESTONES VỚI 3 BỨC ẢNH THẬT) -->
+    <section id="milestones" class="py-20 sm:py-28 px-4 max-w-6xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto reveal">
+            <span class="text-gold-dark uppercase tracking-[0.25em] text-xs font-bold">Our Love Milestones</span>
+            <h2 class="font-serif text-3xl sm:text-5xl font-bold text-matcha-deep mt-2">
+                Hành Trình Yêu Thương
+            </h2>
+            <div class="gold-divider my-4 text-gold">
+                <i class="fa-solid fa-seedling text-sm"></i>
+            </div>
+            <p class="text-charcoal/75 text-sm sm:text-base">
+                Những cột mốc ý nghĩa ghi dấu chặng đường Gia Huy &amp; Phương Uyên cùng nhau vun đắp để đi tới bến bờ hạnh phúc.
+            </p>
+        </div>
+
+        <!-- Timeline 4 Dấu Mốc -->
+        <div class="mt-14 space-y-12 relative before:hidden md:before:block before:content-[''] before:absolute before:left-1/2 before:top-4 before:bottom-4 before:w-0.5 before:bg-gradient-to-b before:from-gold/30 before:via-matcha/40 before:to-gold">
+            
+            <!-- Mốc 1: Lễ Dạm Ngõ (30.05.2026) - Ảnh ba29a828e5da65843ccb.jpg -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center reveal relative">
+                <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-matcha text-white border-4 border-ivory shadow items-center justify-center z-10">
+                    <i class="fa-solid fa-heart text-xs"></i>
+                </div>
+                <div class="md:text-right space-y-2 order-2 md:order-1">
+                    <span class="inline-block px-3.5 py-1 rounded-full bg-matcha-pale text-matcha-dark text-xs font-bold tracking-wider">
+                        30 . 05 . 2026
+                    </span>
+                    <h3 class="font-serif text-2xl sm:text-3xl font-bold text-matcha-deep">
+                        1. Lễ Dạm Ngõ Ấm Cúng
+                    </h3>
+                    <p class="text-sm text-charcoal/80 leading-relaxed">
+                        Ngày hai bên gia đình chính thức gặp mặt, trao nhau lời chúc phúc và se duyên cho đôi trẻ. Một khởi đầu trang trọng, dịu dàng và ngập tràn niềm vui.
+                    </p>
+                </div>
+                <div class="order-1 md:order-2">
+                    <div onclick="openLightbox(0)" class="group cursor-pointer rounded-3xl overflow-hidden border-2 border-gold/30 shadow-md bg-white max-w-md mx-auto md:mx-0">
+                        <img src="ba29a828e5da65843ccb.jpg"
+                             onerror="this.src='https://placehold.co/600x450/E8F0E8/527355?text=Le+Dam+Ngo+30.05.2026'"
+                             alt="Lễ Dạm Ngõ Gia Huy & Phương Uyên"
+                             class="w-full h-72 sm:h-80 object-cover object-top group-hover:scale-105 transition duration-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mốc 2: Lớp Giáo Lý Hôn Nhân - Ảnh df86b108fcfa7ca425eb.jpg -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center reveal relative">
+                <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-gold text-white border-4 border-ivory shadow items-center justify-center z-10">
+                    <i class="fa-solid fa-book-open text-xs"></i>
+                </div>
+                <div class="order-1">
+                    <div onclick="openLightbox(1)" class="group cursor-pointer rounded-3xl overflow-hidden border-2 border-gold/30 shadow-md bg-white max-w-md mx-auto md:ml-auto md:mr-0">
+                        <img src="df86b108fcfa7ca425eb.jpg"
+                             onerror="this.src='https://placehold.co/600x450/E8F0E8/527355?text=Giao+Ly+Hon+Nhan'"
+                             alt="Hoàn thành lớp Giáo Lý Hôn Nhân tại Nhà thờ Đắc Lộ"
+                             class="w-full h-72 sm:h-80 object-cover object-center group-hover:scale-105 transition duration-500">
+                    </div>
+                </div>
+                <div class="space-y-2 order-2">
+                    <span class="inline-block px-3.5 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-bold tracking-wider">
+                        Nhà Thờ Đắc Lộ
+                    </span>
+                    <h3 class="font-serif text-2xl sm:text-3xl font-bold text-matcha-deep">
+                        2. Cùng Nhau Chuẩn Bị Hành Trang Hôn Nhân
+                    </h3>
+                    <p class="text-sm text-charcoal/80 leading-relaxed">
+                        Hoàn thành khóa Giáo lý Hôn nhân tại Nhà thờ Đắc Lộ — nơi chúng mình học cách lắng nghe, thấu hiểu, bao dung và cùng nhau xây dựng nền tảng vững chắc cho gia đình nhỏ.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Mốc 3: Về Chung Một Nhà (Đăng Ký Kết Hôn) - Ảnh 44503b667794f7caae85.jpg -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center reveal relative">
+                <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-matcha text-white border-4 border-ivory shadow items-center justify-center z-10">
+                    <i class="fa-solid fa-file-signature text-xs"></i>
+                </div>
+                <div class="md:text-right space-y-2 order-2 md:order-1">
+                    <span class="inline-block px-3.5 py-1 rounded-full bg-matcha-pale text-matcha-dark text-xs font-bold tracking-wider">
+                        Chính Thức Nên Duyên Vợ Chồng
+                    </span>
+                    <h3 class="font-serif text-2xl sm:text-3xl font-bold text-matcha-deep">
+                        3. Về Chung Một Nhà
+                    </h3>
+                    <p class="text-sm text-charcoal/80 leading-relaxed">
+                        Khoảnh khắc cầm trên tay tờ Giấy chứng nhận kết hôn với nụ cười rạng rỡ. Từ nay, chúng mình chính thức trở thành bạn đời hợp pháp và tri kỷ trọn đời của nhau.
+                    </p>
+                </div>
+                <div class="order-1 md:order-2">
+                    <div onclick="openLightbox(2)" class="group cursor-pointer rounded-3xl overflow-hidden border-2 border-gold/30 shadow-md bg-white max-w-md mx-auto md:mx-0">
+                        <img src="44503b667794f7caae85.jpg"
+                             onerror="this.src='https://placehold.co/600x450/E8F0E8/527355?text=Giay+Chung+Nhan+Ket+Hon'"
+                             alt="Gia Huy & Phương Uyên nhận Giấy chứng nhận kết hôn"
+                             class="w-full h-72 sm:h-80 object-cover object-center group-hover:scale-105 transition duration-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mốc 4: Lễ Thành Hôn 23.01.2027 -->
+            <div class="max-w-2xl mx-auto pt-4 reveal relative z-10">
+                <div class="bg-gradient-to-br from-matcha-pale via-white to-cream rounded-3xl p-7 sm:p-9 border-2 border-gold shadow-lg text-center">
+                    <div class="w-12 h-12 rounded-full bg-gold text-white flex items-center justify-center mx-auto mb-3 shadow">
+                        <i class="fa-solid fa-champagne-glasses"></i>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-gold-dark">
+                        23 . 01 . 2027 &bull; 11:30 Trưa
+                    </span>
+                    <h3 class="font-serif text-3xl sm:text-4xl font-bold text-matcha-deep mt-1">
+                        4. Lễ Thành Hôn &amp; Tiệc Cưới Chung Vui
+                    </h3>
+                    <p class="text-sm text-charcoal/80 mt-2">
+                        Tại <strong>Trung tâm Hội nghị Tiệc cưới Victory</strong> (12 Mai Hắc Đế, P. Buôn Ma Thuột, Đắk Lắk). Rất hân hạnh được đón tiếp Quý vị!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. THÔNG TIN CHI TIẾT TIỆC CƯỚI & BẢN ĐỒ -->
+    <section id="event" class="py-20 bg-cream/80 border-y border-gold/20 px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto reveal">
+                <span class="text-gold-dark uppercase tracking-[0.25em] text-xs font-bold">Wedding Invitation</span>
+                <h2 class="font-serif text-3xl sm:text-5xl font-bold text-matcha-deep mt-2">
+                    Trân Trọng Kính Mời
+                </h2>
+                <div class="gold-divider my-4 text-gold">
+                    <i class="fa-solid fa-location-dot text-sm"></i>
+                </div>
+            </div>
+
+            <div class="mt-10 bg-white rounded-[2.2rem] p-7 sm:p-11 border border-gold/35 shadow-xl reveal">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-5">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-matcha-pale text-matcha-dark text-xs font-semibold">
+                            <i class="fa-solid fa-utensils"></i> Tiệc Cưới Chiêu Đãi
+                        </div>
+                        <h3 class="font-serif text-3xl sm:text-4xl font-bold text-matcha-deep leading-tight">
+                            Trung tâm Hội nghị Tiệc cưới Victory
+                        </h3>
+
+                        <div class="space-y-3.5 text-sm sm:text-base text-charcoal/85 bg-ivory p-5 rounded-2xl border border-gold/20">
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-xl bg-matcha/15 text-matcha-dark flex items-center justify-center shrink-0 mt-0.5">
+                                    <i class="fa-regular fa-clock"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-charcoal/60 block">Thời gian đón khách &amp; khai tiệc</span>
+                                    <strong class="text-charcoal text-base sm:text-lg">11:30 Trưa — Thứ Bảy, ngày 23/01/2027</strong>
+                                    <span class="block text-xs text-gold-dark font-medium mt-0.5">
+                                        (Nhằm ngày 16 tháng 12 năm Bính Ngọ)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-3.5 pt-2 border-t border-gold/15">
+                                <div class="w-9 h-9 rounded-xl bg-gold/15 text-gold-dark flex items-center justify-center shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-map-pin"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-charcoal/60 block">Địa chỉ tổ chức</span>
+                                    <strong class="text-charcoal">12 Mai Hắc Đế, phường Buôn Ma Thuột, tỉnh Đắk Lắk</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 pt-1">
+                            <a href="https://www.google.com/maps/search/?api=1&query=Trung+tam+Hoi+nghi+Tiec+cuoi+Victory+12+Mai+Hac+De+Buon+Ma+Thuot+Dak+Lak" 
+                               target="_blank" rel="noopener noreferrer"
+                               class="flex-1 min-w-[180px] py-3.5 px-5 rounded-2xl bg-matcha hover:bg-matcha-dark text-white text-sm font-medium text-center transition shadow-md flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-diamond-turn-right"></i> Chỉ Đường Google Maps
+                            </a>
+                            <button onclick="downloadCalendarICS()"
+                                    class="py-3.5 px-5 rounded-2xl bg-gold/15 hover:bg-gold text-gold-dark hover:text-white border border-gold/40 text-sm font-medium transition flex items-center justify-center gap-2">
+                                <i class="fa-regular fa-calendar-plus"></i> Lưu Vào Lịch
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Khung bản đồ trực quan nhúng -->
+                    <div class="lg:col-span-5">
+                        <div class="rounded-3xl overflow-hidden border-2 border-gold/30 shadow-inner h-72 sm:h-80 bg-matcha-pale relative">
+                            <iframe 
+                                title="Bản đồ Trung tâm Hội nghị Tiệc cưới Victory"
+                                src="https://maps.google.com/maps?q=12%20Mai%20H%E1%BA%AFc%20%C4%90%E1%BA%BF,%20Bu%C3%B4n%20Ma%20Thu%E1%BB%99t,%20%C4%90%E1%BA%AFk%20L%E1%BA%AFk&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                                class="w-full h-full border-0"
+                                loading="lazy">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. ALBUM KỶ NIỆM CỦA CHÚNG MÌNH (PHOTO GALLERY) -->
+    <section id="gallery" class="py-20 sm:py-28 px-4 max-w-6xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 reveal">
+            <div>
+                <span class="text-gold-dark uppercase tracking-[0.25em] text-xs font-bold">Our Memories</span>
+                <h2 class="font-serif text-3xl sm:text-5xl font-bold text-matcha-deep mt-1">
+                    Album Khoảnh Khắc
+                </h2>
+                <p class="text-sm text-charcoal/70 mt-1">
+                    Chạm vào từng bức ảnh để xem kích thước lớn, hoặc thêm ảnh kỷ niệm mới.
+                </p>
+            </div>
+            <label class="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-matcha-pale hover:bg-matcha text-matcha-deep hover:text-white text-xs font-semibold transition self-start sm:self-auto">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Thêm Ảnh Vào Album
+                <input type="file" accept="image/*" multiple onchange="handleAddGalleryPhotos(event)" class="hidden">
+            </label>
+        </div>
+
+        <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10 reveal">
+            <!-- Render bằng JS bao gồm 3 ảnh thật của cặp đôi -->
+        </div>
+    </section>
+
+    <!-- 6. XÁC NHẬN THAM DỰ (RSVP) & SỔ LƯU BÚT LỜI CHÚC -->
+    <section id="rsvp" class="py-20 sm:py-28 bg-gradient-to-b from-matcha-pale/60 to-ivory px-4 border-t border-gold/20">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto reveal">
+                <span class="text-gold-dark uppercase tracking-[0.25em] text-xs font-bold">RSVP &amp; Wishes</span>
+                <h2 class="font-serif text-3xl sm:text-5xl font-bold text-matcha-deep mt-2">
+                    Xác Nhận Tham Dự &amp; Lời Chúc
+                </h2>
+                <div class="gold-divider my-4 text-gold">
+                    <i class="fa-solid fa-envelope-open-text text-sm"></i>
+                </div>
+                <p class="text-charcoal/75 text-sm sm:text-base">
+                    Sự hiện diện của bạn là niềm hạnh phúc lớn nhất của Gia Huy &amp; Phương Uyên!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12 reveal">
+                <!-- Cột Form Đăng Ký Tham Dự (6 cột) -->
+                <div class="lg:col-span-6 bg-white rounded-[2rem] p-6 sm:p-9 border border-gold/35 shadow-lg">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-serif text-2xl sm:text-3xl font-bold text-matcha-deep">Đăng Ký Tham Dự</h3>
+                            <p class="text-xs text-charcoal/60 mt-0.5">Giúp chúng mình chuẩn bị chu đáo chỗ ngồi cho bạn</p>
+                        </div>
+                        <span class="w-11 h-11 rounded-2xl bg-matcha-pale text-matcha-dark flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-user-check"></i>
+                        </span>
+                    </div>
+
+                    <form id="rsvp-form" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-charcoal/80 mb-1.5">
+                                Họ và tên của bạn <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="rsvp-name" required placeholder="Nhập họ tên khách mời..."
+                                   class="w-full px-4 py-3 rounded-xl bg-ivory border border-gold/30 focus:border-matcha focus:outline-none text-sm transition">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-charcoal/80 mb-1.5">
+                                    Khách mời của
+                                </label>
+                                <select id="rsvp-side" class="w-full px-4 py-3 rounded-xl bg-ivory border border-gold/30 focus:border-matcha focus:outline-none text-sm transition">
+                                    <option value="Nhà Trai (Gia Huy)">Nhà Trai (Gia Huy)</option>
+                                    <option value="Nhà Gái (Phương Uyên)">Nhà Gái (Phương Uyên)</option>
+                                    <option value="Bạn Chung Hai Đứa">Bạn Chung Hai Đứa</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-charcoal/80 mb-1.5">
+                                    Trạng thái tham dự
+                                </label>
+                                <select id="rsvp-status" onchange="toggleGuestCountVisibility()" class="w-full px-4 py-3 rounded-xl bg-ivory border border-gold/30 focus:border-matcha focus:outline-none text-sm transition">
+                                    <option value="Sẽ tham dự">🎉 Sẽ tham dự tiệc cưới</option>
+                                    <option value="Rất tiếc không thể tham dự">💌 Rất tiếc không thể tham dự</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Bộ đếm số lượng người tham dự trực quan (+/-) -->
+                        <div id="guest-count-wrapper" class="bg-matcha-pale/50 p-4 rounded-2xl border border-matcha/20">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-matcha-deep">
+                                        Số lượng người tham dự
+                                    </label>
+                                    <span class="text-[11px] text-charcoal/65">Bao gồm cả bạn và người đi cùng</span>
+                                </div>
+                                <div class="flex items-center gap-3 bg-white px-3 py-1.5 rounded-xl border border-gold/30 shadow-sm">
+                                    <button type="button" onclick="adjustGuestCount(-1)" class="w-8 h-8 rounded-lg bg-cream hover:bg-matcha hover:text-white text-charcoal font-bold transition flex items-center justify-center">
+                                        <i class="fa-solid fa-minus text-xs"></i>
+                                    </button>
+                                    <span id="rsvp-count-display" class="font-serif text-xl font-bold text-matcha-deep w-16 text-center">
+                                        1 người
+                                    </span>
+                                    <button type="button" onclick="adjustGuestCount(1)" class="w-8 h-8 rounded-lg bg-cream hover:bg-matcha hover:text-white text-charcoal font-bold transition flex items-center justify-center">
+                                        <i class="fa-solid fa-plus text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="rsvp-count-val" value="1">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-charcoal/80 mb-1.5">
+                                Ghi chú thêm (Tùy chọn)
+                            </label>
+                            <input type="text" id="rsvp-note" placeholder="Ví dụ: Ăn chay, đi cùng trẻ em, đến từ xa..."
+                                   class="w-full px-4 py-3 rounded-xl bg-ivory border border-gold/30 focus:border-matcha focus:outline-none text-sm transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-charcoal/80 mb-1.5">
+                                Lời chúc gửi tới Cô dâu &amp; Chú rể (Tùy chọn)
+                            </label>
+                            <textarea id="rsvp-wish" rows="2" placeholder="Gửi lời chúc ngọt ngào kèm theo xác nhận..."
+                                      class="w-full px-4 py-2.5 rounded-xl bg-ivory border border-gold/30 focus:border-matcha focus:outline-none text-sm transition"></textarea>
+                        </div>
+
+                        <button type="submit"
+                                class="w-full py-3.5 px-6 rounded-2xl bg-matcha hover:bg-matcha-dark text-white font-semibold text-sm tracking-wide shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Gửi Xác Nhận Tham Dự
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Cột Sổ Lưu Bút & Gửi Lời Chúc Riêng (6 cột) -->
+                <div id="guestbook" class="lg:col-span-6 bg-white rounded-[2rem] p-6 sm:p-9 border border-gold/35 shadow-lg flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-serif text-2xl sm:text-3xl font-bold text-matcha-deep">Sổ Lưu Bút Lời Chúc</h3>
+                            <p class="text-xs text-charcoal/60 mt-0.5">Lưu giữ những lời chúc phúc yêu thương</p>
+                        </div>
+                        <span id="wishes-badge" class="px-3.5 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-bold">
+                            0 lời chúc
+                        </span>
+                    </div>
+
+                    <!-- Form gửi lời chúc nhanh độc lập -->
+                    <form id="quick-wish-form" class="bg-ivory p-4 rounded-2xl border border-gold/25 mb-5 space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <input type="text" id="wish-only-name" required placeholder="Tên của bạn *"
+                                   class="px-3.5 py-2 rounded-xl bg-white border border-gold/25 focus:border-matcha focus:outline-none text-xs sm:text-sm">
+                            <select id="wish-only-side" class="px-3.5 py-2 rounded-xl bg-white border border-gold/25 focus:border-matcha focus:outline-none text-xs sm:text-sm">
+                                <option value="Bạn Chú Rể">Bạn Chú Rể (Gia Huy)</option>
+                                <option value="Bạn Cô Dâu">Bạn Cô Dâu (Phương Uyên)</option>
+                                <option value="Người thân">Người thân Gia đình</option>
+                            </select>
+                        </div>
+                        <textarea id="wish-only-text" rows="2" required placeholder="Viết lời chúc của bạn tại đây... *"
+                                  class="w-full px-3.5 py-2 rounded-xl bg-white border border-gold/25 focus:border-matcha focus:outline-none text-xs sm:text-sm"></textarea>
+                        
+                        <!-- Gợi ý lời chúc 1 chạm -->
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" onclick="setQuickWish('Chúc Gia Huy & Phương Uyên trăm năm hạnh phúc, mãi yêu thương nhau!')" 
+                                        class="text-[11px] bg-matcha-pale hover:bg-matcha hover:text-white text-matcha-dark px-2.5 py-1 rounded-full transition">
+                                    + Trăm năm hạnh phúc
+                                </button>
+                                <button type="button" onclick="setQuickWish('Chúc mừng ngày trọng đại của hai bạn! Sớm đón thiên thần nhỏ nhé!')" 
+                                        class="text-[11px] bg-matcha-pale hover:bg-matcha hover:text-white text-matcha-dark px-2.5 py-1 rounded-full transition">
+                                    + Sớm có tin vui
+                                </button>
+                            </div>
+                            <button type="submit" class="px-4 py-2 rounded-xl bg-gold hover:bg-gold-dark text-white text-xs font-semibold transition shadow-sm">
+                                Gửi Lời Chúc
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Danh sách thẻ lời chúc -->
+                    <div id="guestbook-list" class="space-y-3 overflow-y-auto max-h-[340px] pr-1.5 guestbook-scroll flex-1">
+                        <!-- Render từ JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. FOOTER -->
+    <footer class="bg-matcha-deep text-white py-14 px-4 text-center">
+        <div class="max-w-3xl mx-auto">
+            <p class="font-script text-5xl sm:text-6xl text-gold-light">
+                Gia Huy &amp; Phương Uyên
+            </p>
+            <p class="font-serif italic text-lg text-white/85 mt-2">
+                23 . 01 . 2027 &bull; Buôn Ma Thuột, Đắk Lắk
+            </p>
+            <div class="w-16 h-px bg-gold/40 mx-auto my-6"></div>
+            <p class="text-xs text-white/65">
+                Cảm ơn bạn đã dành thời gian ghé thăm thiệp cưới online và gửi lời chúc phúc tới chúng mình!
+            </p>
+            <button onclick="openAdminModal()" class="mt-5 inline-flex items-center gap-1.5 text-xs text-gold-light hover:underline bg-white/10 px-4 py-2 rounded-full">
+                <i class="fa-solid fa-list-check"></i> Xem Danh Sách Khách Xác Nhận (<span id="footer-rsvp-total">0</span> khách)
+            </button>
+        </div>
+    </footer>
+
+    <!-- NÚT NHẠC NỀN NỔI GÓC DƯỚI -->
+    <div class="fixed bottom-5 left-5 z-40 flex items-center gap-2">
+        <button onclick="toggleMusic()" title="Bật / Tắt nhạc nền"
+                class="w-12 h-12 rounded-full bg-white/95 backdrop-blur-md border-2 border-gold shadow-lg flex items-center justify-center text-matcha-dark hover:scale-105 transition relative">
+            <i id="music-disc-icon" class="fa-solid fa-compact-disc text-2xl"></i>
+            <span id="music-dot" class="hidden absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-matcha border-2 border-white"></span>
+        </button>
+        <span id="music-label" onclick="toggleMusic()" class="hidden sm:inline-block cursor-pointer bg-white/90 backdrop-blur-md text-xs font-medium text-charcoal px-3 py-1.5 rounded-full shadow border border-gold/25">
+            Nhạc nền
+        </span>
+    </div>
+
+    <!-- MODAL LIGHTBOX XEM ẢNH PHÓNG TO -->
+    <div id="lightbox-modal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <button onclick="closeLightbox()" class="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center text-lg transition">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <button onclick="changeLightbox(-1)" class="absolute left-3 sm:left-6 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center text-lg transition">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="max-w-4xl max-h-[88vh] flex flex-col items-center">
+            <img id="lightbox-img" src="" alt="Ảnh kỷ niệm" class="max-h-[78vh] w-auto rounded-2xl shadow-2xl object-contain">
+            <p id="lightbox-caption" class="text-white/90 text-sm font-serif italic mt-3 text-center"></p>
+        </div>
+        <button onclick="changeLightbox(1)" class="absolute right-3 sm:right-6 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center text-lg transition">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- MODAL QUẢN LÝ DANH SÁCH KHÁCH RSVP & THÊM ẢNH -->
+    <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 border border-gold/40 shadow-2xl relative my-8 max-h-[88vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-4 border-b border-gold/20">
+                <div>
+                    <h3 class="font-serif text-2xl font-bold text-matcha-deep">Quản Lý Khách Tham Dự &amp; Album</h3>
+                    <p class="text-xs text-charcoal/65">Thống kê lượt đăng ký tham dự của khách mời</p>
+                </div>
+                <button onclick="closeAdminModal()" class="w-9 h-9 rounded-full bg-cream hover:bg-gold/20 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Thống kê nhanh -->
+            <div class="grid grid-cols-3 gap-3 my-5 text-center">
+                <div class="bg-matcha-pale/70 p-3.5 rounded-2xl">
+                    <span id="stat-total-guests" class="font-serif text-2xl sm:text-3xl font-bold text-matcha-deep block">0</span>
+                    <span class="text-[11px] font-medium text-charcoal/75">Tổng khách tham dự</span>
+                </div>
+                <div class="bg-gold/15 p-3.5 rounded-2xl">
+                    <span id="stat-attending-groups" class="font-serif text-2xl sm:text-3xl font-bold text-gold-dark block">0</span>
+                    <span class="text-[11px] font-medium text-charcoal/75">Lượt xác nhận có mặt</span>
+                </div>
+                <div class="bg-cream p-3.5 rounded-2xl">
+                    <span id="stat-total-wishes" class="font-serif text-2xl sm:text-3xl font-bold text-charcoal block">0</span>
+                    <span class="text-[11px] font-medium text-charcoal/75">Lời chúc đã nhận</span>
+                </div>
+            </div>
+
+            <!-- Danh sách khách đã RSVP -->
+            <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1 guestbook-scroll" id="admin-rsvp-list">
+                <!-- Render bằng JS -->
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gold/20 flex flex-wrap justify-between items-center gap-3">
+                <label class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-matcha text-white text-xs font-semibold hover:bg-matcha-dark transition">
+                    <i class="fa-solid fa-image"></i> Tải Thêm Ảnh Cưới
+                    <input type="file" accept="image/*" multiple onchange="handleAddGalleryPhotos(event)" class="hidden">
+                </label>
+                <button onclick="closeAdminModal()" class="px-5 py-2 rounded-xl bg-cream text-charcoal text-xs font-semibold">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // 1. DỮ LIỆU ẢNH THẬT CỦA CẶP ĐÔI & LƯU TRỮ
+        // ==========================================
+        const INITIAL_PHOTOS = [
+            {
+                url: "ba29a828e5da65843ccb.jpg",
+                title: "Lễ Dạm Ngõ (30.05.2026)",
+                caption: "Lễ Dạm Ngõ ấm cúng của Gia Huy & Phương Uyên - 30.05.2026"
+            },
+            {
+                url: "df86b108fcfa7ca425eb.jpg",
+                title: "Lớp Giáo Lý Hôn Nhân",
+                caption: "Hoàn thành khóa Giáo lý Hôn nhân tại Nhà thờ Đắc Lộ"
+            },
+            {
+                url: "44503b667794f7caae85.jpg",
+                title: "Giấy Chứng Nhận Kết Hôn",
+                caption: "Chính thức về chung một nhà - Gia Huy & Phương Uyên"
+            }
+        ];
+
+        let galleryPhotos = [...INITIAL_PHOTOS];
+
+        const INITIAL_RSVPS = [
+            {
+                name: "Hoàng Minh & Thảo Nhi",
+                side: "Bạn Chú Rể (Gia Huy)",
+                status: "Sẽ tham dự",
+                count: 2,
+                note: "Có mặt đúng 11h30 chung vui cùng hai bạn!"
+            },
+            {
+                name: "Thanh Trúc",
+                side: "Bạn Cô Dâu (Phương Uyên)",
+                status: "Sẽ tham dự",
+                count: 1,
+                note: "Chúc cô dâu Phương Uyên xinh đẹp nhất ngày cưới!"
+            }
+        ];
+
+        const INITIAL_WISHES = [
+            {
+                name: "Hoàng Minh & Thảo Nhi",
+                side: "Bạn Chú Rể (Gia Huy)",
+                wish: "Chúc mừng Gia Huy & Phương Uyên! Từ Lễ Dạm Ngõ đến ngày về chung một nhà thật đẹp đôi. Chúc hai bạn trăm năm hạnh phúc viên mãn!",
+                time: "Hôm nay"
+            },
+            {
+                name: "Thanh Trúc",
+                side: "Bạn Cô Dâu (Phương Uyên)",
+                wish: "Chúc Phương Uyên và Gia Huy mãi yêu thương, thấu hiểu và đồng hành cùng nhau trên mọi chặng đường phía trước nhé!",
+                time: "Hôm nay"
+            },
+            {
+                name: "Gia Đình Anh Tuấn (Buôn Ma Thuột)",
+                side: "Người thân",
+                wish: "Hẹn gặp hai cháu tại Victory ngày 23/01/2027! Chúc hai cháu xây dựng tổ ấm thật hạnh phúc, thuận vợ thuận chồng.",
+                time: "Hôm qua"
+            }
+        ];
+
+        let rsvpList = JSON.parse(localStorage.getItem('gh_pu_rsvp_2027')) || [...INITIAL_RSVPS];
+        let wishesList = JSON.parse(localStorage.getItem('gh_pu_wishes_2027')) || [...INITIAL_WISHES];
+
+        // ==========================================
+        // 2. THÔNG BÁO TOAST
+        // ==========================================
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "bg-matcha-deep text-white border border-gold px-4 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-medium flex items-center gap-2.5 transform transition-all duration-300 translate-x-full opacity-0 pointer-events-auto max-w-xs sm:max-w-sm";
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-gold-light"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.remove('translate-x-full', 'opacity-0'));
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ==========================================
+        // 3. ĐỒNG HỒ ĐẾM NGƯỢC TỚI 11:30 23/01/2027 (GMT+7)
+        // ==========================================
+        function updateCountdown() {
+            const targetTime = new Date("2027-01-23T11:30:00+07:00").getTime();
+            const now = new Date().getTime();
+            const diff = targetTime - now;
+
+            if (diff <= 0) {
+                document.getElementById('cd-days').textContent = "00";
+                document.getElementById('cd-hours').textContent = "00";
+                document.getElementById('cd-minutes').textContent = "00";
+                document.getElementById('cd-seconds').textContent = "00";
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('cd-days').textContent = String(days).padStart(2, '0');
+            document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('cd-minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('cd-seconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        // ==========================================
+        // 4. ALBUM ẢNH & LIGHTBOX
+        // ==========================================
+        let currentPhotoIndex = 0;
+
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = galleryPhotos.map((photo, idx) => `
+                <div onclick="openLightbox(${idx})" 
+                     class="group relative aspect-[3/4] rounded-3xl overflow-hidden cursor-pointer border-2 border-gold/25 bg-white shadow-sm hover:shadow-xl transition-all duration-500">
+                    <img src="${photo.url}" 
+                         onerror="this.src='https://placehold.co/600x800/E8F0E8/527355?text=Gia+Huy+%26+Phuong+Uyen'"
+                         alt="${escapeHTML(photo.title)}"
+                         class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex flex-col justify-end p-5">
+                        <span class="text-[11px] uppercase tracking-wider text-gold-light font-semibold">${escapeHTML(photo.title)}</span>
+                        <p class="text-white text-xs sm:text-sm font-serif italic mt-0.5">${escapeHTML(photo.caption)}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleAddGalleryPhotos(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+
+            files.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    galleryPhotos.push({
+                        url: e.target.result,
+                        title: "Khoảnh Khắc Cưới",
+                        caption: "Gia Huy & Phương Uyên - Kỷ niệm yêu thương"
+                    });
+                    renderGallery();
+                };
+                reader.readAsDataURL(file);
+            });
+            showToast(`Đã thêm ${files.length} ảnh mới vào Album!`);
+        }
+
+        function openLightbox(index) {
+            currentPhotoIndex = index;
+            updateLightbox();
+            document.getElementById('lightbox-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function changeLightbox(step) {
+            currentPhotoIndex = (currentPhotoIndex + step + galleryPhotos.length) % galleryPhotos.length;
+            updateLightbox();
+        }
+
+        function updateLightbox() {
+            const item = galleryPhotos[currentPhotoIndex];
+            document.getElementById('lightbox-img').src = item.url;
+            document.getElementById('lightbox-caption').textContent = `${item.caption} (${currentPhotoIndex + 1}/${galleryPhotos.length})`;
+        }
+
+        // ==========================================
+        // 5. FORM ĐĂNG KÝ THAM DỰ (RSVP) & SỐ LƯỢNG
+        // ==========================================
+        let guestCount = 1;
+
+        function adjustGuestCount(delta) {
+            guestCount = Math.min(10, Math.max(1, guestCount + delta));
+            document.getElementById('rsvp-count-val').value = guestCount;
+            document.getElementById('rsvp-count-display').textContent = `${guestCount} người`;
+        }
+
+        function toggleGuestCountVisibility() {
+            const status = document.getElementById('rsvp-status').value;
+            const wrapper = document.getElementById('guest-count-wrapper');
+            if (status === "Sẽ tham dự") {
+                wrapper.classList.remove('opacity-40', 'pointer-events-none');
+            } else {
+                wrapper.classList.add('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        document.getElementById('rsvp-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('rsvp-name').value.trim();
+            const side = document.getElementById('rsvp-side').value;
+            const status = document.getElementById('rsvp-status').value;
+            const count = status === "Sẽ tham dự" ? parseInt(document.getElementById('rsvp-count-val').value, 10) : 0;
+            const note = document.getElementById('rsvp-note').value.trim();
+            const wish = document.getElementById('rsvp-wish').value.trim();
+
+            if (!name) return;
+
+            rsvpList.unshift({ name, side, status, count, note });
+            localStorage.setItem('gh_pu_rsvp_2027', JSON.stringify(rsvpList));
+
+            // Nếu khách có nhập lời chúc kèm theo thì tự động đưa vào Sổ lưu bút
+            if (wish) {
+                wishesList.unshift({
+                    name,
+                    side,
+                    wish,
+                    time: "Vừa gửi xong"
+                });
+                localStorage.setItem('gh_pu_wishes_2027', JSON.stringify(wishesList));
+                renderWishes();
+            }
+
+            updateStats();
+            this.reset();
+            guestCount = 1;
+            adjustGuestCount(0);
+            toggleGuestCountVisibility();
+            showToast(`Cảm ơn ${name}! Chúng mình đã ghi nhận thông tin tham dự của bạn.`);
+        });
+
+        // ==========================================
+        // 6. SỔ LƯU BÚT & GỬI LỜI CHÚC
+        // ==========================================
+        function setQuickWish(text) {
+            document.getElementById('wish-only-text').value = text;
+        }
+
+        function renderWishes() {
+            const list = document.getElementById('guestbook-list');
+            document.getElementById('wishes-badge').textContent = `${wishesList.length} lời chúc`;
+
+            list.innerHTML = wishesList.map(item => `
+                <div class="bg-ivory p-4 rounded-2xl border border-gold/25 hover:border-matcha/40 transition">
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="font-bold text-sm text-charcoal">${escapeHTML(item.name)}</h4>
+                        <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-matcha-pale text-matcha-dark font-semibold">
+                            ${escapeHTML(item.side)}
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-charcoal/85 italic mt-2 leading-relaxed">
+                        “${escapeHTML(item.wish)}”
+                    </p>
+                    <p class="text-[10px] text-charcoal/45 mt-1.5 text-right">${escapeHTML(item.time || 'Vừa xong')}</p>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('quick-wish-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('wish-only-name').value.trim();
+            const side = document.getElementById('wish-only-side').value;
+            const wish = document.getElementById('wish-only-text').value.trim();
+
+            if (!name || !wish) return;
+
+            wishesList.unshift({
+                name,
+                side,
+                wish,
+                time: "Vừa gửi xong"
+            });
+            localStorage.setItem('gh_pu_wishes_2027', JSON.stringify(wishesList));
+            renderWishes();
+            updateStats();
+            this.reset();
+            showToast(`Cảm ơn ${name} đã gửi lời chúc phúc tới Gia Huy & Phương Uyên!`);
+        });
+
+        // ==========================================
+        // 7. THỐNG KÊ & MODAL QUẢN LÝ
+        // ==========================================
+        function updateStats() {
+            const attendingGroups = rsvpList.filter(r => r.status === "Sẽ tham dự");
+            const totalGuests = attendingGroups.reduce((sum, item) => sum + (item.count || 0), 0);
+
+            document.getElementById('footer-rsvp-total').textContent = totalGuests;
+            document.getElementById('stat-total-guests').textContent = totalGuests;
+            document.getElementById('stat-attending-groups').textContent = attendingGroups.length;
+            document.getElementById('stat-total-wishes').textContent = wishesList.length;
+
+            const adminList = document.getElementById('admin-rsvp-list');
+            adminList.innerHTML = rsvpList.map(r => `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-2xl bg-ivory border border-gold/20 text-xs">
+                    <div>
+                        <strong class="text-sm text-charcoal">${escapeHTML(r.name)}</strong>
+                        <span class="text-matcha-dark font-medium ml-1.5">&bull; ${escapeHTML(r.side)}</span>
+                        ${r.note ? `<p class="text-charcoal/65 mt-0.5">Ghi chú: ${escapeHTML(r.note)}</p>` : ''}
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="px-2.5 py-1 rounded-full font-semibold ${r.status === 'Sẽ tham dự' ? 'bg-matcha-pale text-matcha-deep' : 'bg-gold/15 text-gold-dark'}">
+                            ${escapeHTML(r.status)} ${r.count > 0 ? `(${r.count} người)` : ''}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAdminModal() {
+            updateStats();
+            document.getElementById('admin-modal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 8. LƯU LỊCH (.ICS) VÀO ĐIỆN THOẠI
+        // ==========================================
+        function downloadCalendarICS() {
+            const icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//ThiepCuoiOnline//GiaHuyPhuongUyen//VI',
+                'BEGIN:VEVENT',
+                'DTSTART:20270123T043000Z',
+                'DTEND:20270123T073000Z',
+                'SUMMARY:Tiệc Cưới Gia Huy & Phương Uyên',
+                'DESCRIPTION:Trân trọng kính mời Quý khách tham dự Tiệc Cưới của Chú rể Gia Huy và Cô dâu Phương Uyên (11h30 ngày 23/01/2027 - 16/12 Bính Ngọ).',
+                'LOCATION:Trung tâm Hội nghị Tiệc cưới Victory - 12 Mai Hắc Đế, phường Buôn Ma Thuột, tỉnh Đắk Lắk',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\r\n');
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Tiec-Cuoi-Gia-Huy-Phuong-Uyen-23-01-2027.ics';
+            link.click();
+            showToast('Đã tải file lịch sự kiện (.ics) về thiết bị của bạn!');
+        }
+
+        // ==========================================
+        // 9. NHẠC NỀN PIANO NHẸ NHÀNG (TONE.JS)
+        // ==========================================
+        let isMusicPlaying = false;
+        let synth = null;
+        let loop = null;
+
+        async function toggleMusic() {
+            const disc = document.getElementById('music-disc-icon');
+            const dot = document.getElementById('music-dot');
+            const label = document.getElementById('music-label');
+
+            if (!isMusicPlaying) {
+                try {
+                    await Tone.start();
+                    if (!synth) {
+                        synth = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: "sine" },
+                            envelope: { attack: 0.35, decay: 0.8, sustain: 0.4, release: 2.0 },
+                            volume: -14
+                        }).toDestination();
+
+                        const progression = [
+                            ["C4", "E4", "G4"],
+                            ["G3", "B3", "D4"],
+                            ["A3", "C4", "E4"],
+                            ["E3", "G3", "B3"],
+                            ["F3", "A3", "C4"],
+                            ["C3", "E3", "G3"],
+                            ["F3", "A3", "C4"],
+                            ["G3", "B3", "D4"]
+                        ];
+                        let idx = 0;
+                        loop = new Tone.Loop((time) => {
+                            synth.triggerAttackRelease(progression[idx % progression.length], "2n", time);
+                            idx++;
+                        }, "2n");
+                    }
+                    Tone.Transport.bpm.value = 66;
+                    loop.start(0);
+                    Tone.Transport.start();
+
+                    isMusicPlaying = true;
+                    disc.classList.add('animate-spin-slow', 'text-gold-dark');
+                    dot.classList.remove('hidden');
+                    label.textContent = "Đang phát nhạc";
+                    showToast("Đang phát giai điệu piano nhẹ nhàng...");
+                } catch (err) {
+                    console.error(err);
+                }
+            } else {
+                Tone.Transport.pause();
+                isMusicPlaying = false;
+                disc.classList.remove('animate-spin-slow', 'text-gold-dark');
+                dot.classList.add('hidden');
+                label.textContent = "Nhạc nền";
+            }
+        }
+
+        // ==========================================
+        // 10. HIỆU ỨNG LÁ XANH MATCHA & VÀNG ÁNH KIM RƠI NHẸ
+        // ==========================================
+        function initPetalsCanvas() {
+            const canvas = document.getElementById('petals-canvas');
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            });
+
+            const colors = [
+                'rgba(107, 142, 110, 0.32)',
+                'rgba(143, 176, 146, 0.35)',
+                'rgba(201, 162, 75, 0.35)'
+            ];
+
+            const leaves = Array.from({ length: 22 }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                size: Math.random() * 6 + 4,
+                vy: Math.random() * 0.75 + 0.35,
+                vx: Math.random() * 0.5 - 0.25,
+                angle: Math.random() * Math.PI * 2,
+                spin: Math.random() * 0.02 - 0.01,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            }));
+
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                leaves.forEach(p => {
+                    p.y += p.vy;
+                    p.x += p.vx + Math.sin(p.angle) * 0.28;
+                    p.angle += p.spin;
+
+                    if (p.y > h + 12) { p.y = -12; p.x = Math.random() * w; }
+                    if (p.x > w + 12) p.x = -12;
+                    if (p.x < -12) p.x = w + 12;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.angle);
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function initScrollReveal() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        window.onload = function() {
+            renderGallery();
+            renderWishes();
+            updateStats();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            initPetalsCanvas();
+            initScrollReveal();
+        };
+    </script>
+</body>
+</html>
